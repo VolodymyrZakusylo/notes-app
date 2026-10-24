@@ -19,8 +19,11 @@
   "note": {
     "created": "Created {{date}}",
     "updated": "Updated {{date}}",
+    "view": "View",
     "edit": "Edit",
     "delete": "Delete",
+    "close": "Close",
+    "detailsTitle": "Note details",
     "titlePlaceholder": "Note title",
     "contentPlaceholder": "Write your thoughts...",
     "createTitle": "Create a note",

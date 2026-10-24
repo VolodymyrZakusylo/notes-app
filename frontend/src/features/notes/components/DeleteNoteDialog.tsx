@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import type { Note } from "../types/note";
 
@@ -18,8 +19,26 @@ function DeleteNoteDialog({
 }: DeleteNoteDialogProps) {
   const { t } = useTranslation();
 
+  useEffect(() => {
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape" && !isDeleting) {
+        onCancel();
+      }
+    }
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isDeleting, onCancel]);
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-950/40 p-4 backdrop-blur-sm">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-gray-950/40 p-4 backdrop-blur-sm"
+      onMouseDown={(event) => {
+        if (event.target === event.currentTarget && !isDeleting) {
+          onCancel();
+        }
+      }}
+    >
       <section
         role="alertdialog"
         aria-modal="true"
@@ -36,7 +55,7 @@ function DeleteNoteDialog({
 
         {error && (
           <p role="alert" className="mt-4 text-sm text-red-600">
-            {error}
+            {t(error)}
           </p>
         )}
 

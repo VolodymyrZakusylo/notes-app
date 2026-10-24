@@ -1,6 +1,34 @@
 @Notes.Api_HostAddress = http://localhost:5031
 
-GET {{Notes.Api_HostAddress}}/weatherforecast/
+### Get all notes
+GET {{Notes.Api_HostAddress}}/notes
 Accept: application/json
 
-###
+### Get note by ID (replace GUID with existing ID)
+GET {{Notes.Api_HostAddress}}/notes/00000000-0000-0000-0000-000000000000
+Accept: application/json
+
+### Create a note
+POST {{Notes.Api_HostAddress}}/notes
+Content-Type: application/json
+
+{
+  "title": "Meeting notes",
+  "content": "Discuss sprint goals and project timeline."
+}
+
+### Update a note (replace GUID with existing ID)
+PUT {{Notes.Api_HostAddress}}/notes/00000000-0000-0000-0000-000000000000
+Content-Type: application/json
+
+{
+  "title": "Updated meeting notes",
+  "content": "Updated discussion on sprint goals and deliverables."
+}
+
+### Delete a note (replace GUID with existing ID)
+DELETE {{Notes.Api_HostAddress}}/notes/00000000-0000-0000-0000-000000000000
+
+### API Health Check
+GET {{Notes.Api_HostAddress}}/
+Accept: application/json

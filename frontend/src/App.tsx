@@ -3,6 +3,7 @@ import { useNotesStore } from "./features/notes/store/notesStore";
 import NoteForm from "./features/notes/components/NoteForm";
 import NoteCard from "./features/notes/components/NoteCard";
 import DeleteNoteDialog from "./features/notes/components/DeleteNoteDialog";
+import NoteDetailsDialog from "./features/notes/components/NoteDetailsDialog";
 import type { Note, SaveNoteRequest } from "./features/notes/types/note";
 import { useTranslation } from "react-i18next";
 
@@ -25,6 +26,7 @@ function App() {
   const [search, setSearch] = useState("");
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingNote, setEditingNote] = useState<Note | null>(null);
+  const [viewingNote, setViewingNote] = useState<Note | null>(null);
   const [deletingNote, setDeletingNote] = useState<Note | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -58,11 +60,13 @@ function App() {
   }
 
   function handleCreateNote() {
+    clearError();
     setEditingNote(null);
     setIsFormOpen(true);
   }
 
   function handleEditNote(note: Note) {
+    clearError();
     setEditingNote(note);
     setIsFormOpen(true);
   }
@@ -70,6 +74,7 @@ function App() {
   function handleCloseForm() {
     setIsFormOpen(false);
     setEditingNote(null);
+    clearError();
   }
 
   async function handleConfirmDelete() {
@@ -217,6 +222,7 @@ function App() {
               <NoteCard
                 key={note.id}
                 note={note}
+                onView={(noteToView) => setViewingNote(noteToView)}
                 onEdit={handleEditNote}
                 onDelete={(noteToDelete) => {
                   clearError();
@@ -271,6 +277,13 @@ function App() {
           onCancel={handleCancelDelete}
           isDeleting={isDeleting}
           error={error}
+        />
+      )}
+
+      {viewingNote && (
+        <NoteDetailsDialog
+          note={viewingNote}
+          onClose={() => setViewingNote(null)}
         />
       )}
     </main>

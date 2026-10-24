@@ -35,37 +35,23 @@ export const useNotesStore = create<NotesState>((set) => ({
   },
 
   createNote: async (request) => {
-    set({ error: null });
+    const note = await notesApi.create(request);
 
-    try {
-      const note = await notesApi.create(request);
+    set((state) => ({
+      notes: [note, ...state.notes],
+    }));
 
-      set((state) => ({
-        notes: [note, ...state.notes],
-      }));
-
-      return note;
-    } catch (error) {
-      set({ error: "errors.generic" });
-      throw error;
-    }
+    return note;
   },
 
   updateNote: async (id, request) => {
-    set({ error: null });
+    const updatedNote = await notesApi.update(id, request);
 
-    try {
-      const updatedNote = await notesApi.update(id, request);
+    set((state) => ({
+      notes: state.notes.map((note) => (note.id === id ? updatedNote : note)),
+    }));
 
-      set((state) => ({
-        notes: state.notes.map((note) => (note.id === id ? updatedNote : note)),
-      }));
-
-      return updatedNote;
-    } catch (error) {
-      set({ error: "errors.generic" });
-      throw error;
-    }
+    return updatedNote;
   },
 
   deleteNote: async (id) => {

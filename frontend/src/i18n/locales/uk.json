@@ -19,8 +19,11 @@
   "note": {
     "created": "Створено {{date}}",
     "updated": "Оновлено {{date}}",
+    "view": "Переглянути",
     "edit": "Редагувати",
     "delete": "Видалити",
+    "close": "Закрити",
+    "detailsTitle": "Деталі нотатки",
     "titlePlaceholder": "Назва нотатки",
     "contentPlaceholder": "Запиши свої думки...",
     "createTitle": "Створення нотатки",
