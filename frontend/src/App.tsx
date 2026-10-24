@@ -1,5 +1,9 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNotesStore } from './features/notes/store/notesStore'
+import NoteForm from './features/notes/components/NoteForm'
+import NoteCard from './features/notes/components/NoteCard'
+import DeleteNoteDialog from './features/notes/components/DeleteNoteDialog'
+import type { Note, SaveNoteRequest } from './features/notes/types/note'
 
 function App() {
   const notes = useNotesStore((state) => state.notes)
@@ -7,8 +11,15 @@ function App() {
   const error = useNotesStore((state) => state.error)
   const fetchNotes = useNotesStore((state) => state.fetchNotes)
   const clearError = useNotesStore((state) => state.clearError)
+  const createNote = useNotesStore((state) => state.createNote)
+  const updateNote = useNotesStore((state) => state.updateNote)
+  const deleteNote = useNotesStore((state) => state.deleteNote)
 
   const [search, setSearch] = useState('')
+  const [isFormOpen, setIsFormOpen] = useState(false)
+  const [editingNote, setEditingNote] = useState<Note | null>(null)
+  const [deletingNote, setDeletingNote] = useState<Note | null>(null)
+  const [isDeleting, setIsDeleting] = useState(false)
 
   useEffect(() => {
     void fetchNotes()
@@ -28,12 +39,58 @@ function App() {
     )
   }, [notes, search])
 
-  const formatDate = (date: string) =>
-    new Intl.DateTimeFormat('uk-UA', {
-      day: 'numeric',
-      month: 'short',
-      year: 'numeric',
-    }).format(new Date(date))
+  async function handleSaveNote(request: SaveNoteRequest) {
+    if (editingNote) {
+      await updateNote(editingNote.id, request)
+    } else {
+      await createNote(request)
+    }
+
+    setIsFormOpen(false)
+    setEditingNote(null)
+  }
+
+  function handleCreateNote() {
+    setEditingNote(null)
+    setIsFormOpen(true)
+  }
+
+  function handleEditNote(note: Note) {
+    setEditingNote(note)
+    setIsFormOpen(true)
+  }
+
+  function handleCloseForm() {
+    setIsFormOpen(false)
+    setEditingNote(null)
+  }
+
+  async function handleConfirmDelete() {
+    if (!deletingNote || isDeleting) {
+      return
+    }
+
+    setIsDeleting(true)
+    clearError()
+
+    try {
+      await deleteNote(deletingNote.id)
+      setDeletingNote(null)
+    } catch {
+      return
+    } finally {
+      setIsDeleting(false)
+    }
+  }
+
+  function handleCancelDelete() {
+    if (isDeleting) {
+      return
+    }
+
+    setDeletingNote(null)
+    clearError()
+  }
 
   return (
     <main className="min-h-screen bg-[#f8f7fb] text-[#24212b]">
@@ -46,9 +103,7 @@ function App() {
             <span className="text-xl font-bold tracking-tight">Notes</span>
           </a>
 
-          <span className="text-sm text-gray-500">
-            Your personal space
-          </span>
+          <span className="text-sm text-gray-500">Your personal space</span>
         </div>
       </header>
 
@@ -68,9 +123,16 @@ function App() {
             </p>
           </div>
 
-          <div className="flex h-11 items-center rounded-xl bg-violet-50 px-4 text-sm font-medium text-violet-700">
-            {notes.length} {notes.length === 1 ? 'note' : 'notes'}
-          </div>
+          <button
+            type="button"
+            onClick={handleCreateNote}
+            className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-violet-600 px-5 text-sm font-semibold text-white shadow-sm transition hover:bg-violet-700 focus:outline-none focus:ring-4 focus:ring-violet-200"
+          >
+            <span aria-hidden="true" className="text-lg leading-none">
+              +
+            </span>
+            New note
+          </button>
         </div>
 
         <div className="mt-8">
@@ -102,7 +164,7 @@ function App() {
           </div>
         </div>
 
-        {error && (
+        {error && !deletingNote && (
           <div
             role="alert"
             className="mt-6 flex items-center justify-between gap-4 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700"
@@ -131,28 +193,15 @@ function App() {
         ) : filteredNotes.length > 0 ? (
           <div className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {filteredNotes.map((note) => (
-              <article
+              <NoteCard
                 key={note.id}
-                className="group flex min-h-56 flex-col rounded-2xl border border-gray-200/80 bg-white p-6 shadow-sm transition duration-200 hover:-translate-y-1 hover:border-violet-200 hover:shadow-md"
-              >
-                <div className="flex items-start justify-between gap-3">
-                  <h2 className="line-clamp-2 text-lg font-semibold leading-snug">
-                    {note.title}
-                  </h2>
-
-                  <span className="mt-1 h-2 w-2 shrink-0 rounded-full bg-violet-400" />
-                </div>
-
-                <p className="mt-3 flex-1 whitespace-pre-wrap break-words text-sm leading-6 text-gray-500 [overflow-wrap:anywhere]">
-                  {note.content}
-                </p>
-
-                <div className="mt-6 border-t border-gray-100 pt-4 text-xs text-gray-400">
-                  {note.updatedAt
-                    ? `Updated ${formatDate(note.updatedAt)}`
-                    : `Created ${formatDate(note.createdAt)}`}
-                </div>
-              </article>
+                note={note}
+                onEdit={handleEditNote}
+                onDelete={(noteToDelete) => {
+                  clearError()
+                  setDeletingNote(noteToDelete)
+                }}
+              />
             ))}
           </div>
         ) : (
@@ -183,6 +232,24 @@ function App() {
           </div>
         )}
       </section>
+
+      {isFormOpen && (
+        <NoteForm
+          note={editingNote}
+          onSave={handleSaveNote}
+          onCancel={handleCloseForm}
+        />
+      )}
+
+      {deletingNote && (
+        <DeleteNoteDialog
+          note={deletingNote}
+          onConfirm={handleConfirmDelete}
+          onCancel={handleCancelDelete}
+          isDeleting={isDeleting}
+          error={error}
+        />
+      )}
     </main>
   )
 }
