@@ -1,11 +1,12 @@
-import type { Note } from '../types/note'
+import { useTranslation } from "react-i18next";
+import type { Note } from "../types/note";
 
 interface DeleteNoteDialogProps {
-  note: Note
-  onConfirm: () => void
-  onCancel: () => void
-  isDeleting: boolean
-  error: string | null
+  note: Note;
+  onConfirm: () => void;
+  onCancel: () => void;
+  isDeleting: boolean;
+  error: string | null;
 }
 
 function DeleteNoteDialog({
@@ -15,6 +16,8 @@ function DeleteNoteDialog({
   isDeleting,
   error,
 }: DeleteNoteDialogProps) {
+  const { t } = useTranslation();
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-950/40 p-4 backdrop-blur-sm">
       <section
@@ -24,12 +27,11 @@ function DeleteNoteDialog({
         className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl"
       >
         <h2 id="delete-dialog-title" className="text-lg font-bold">
-          Delete this note?
+          {t("deleteDialog.title")}
         </h2>
 
         <p className="mt-3 text-sm leading-6 text-gray-500">
-          Are you sure you want to delete "{note.title}"? This action cannot
-          be undone.
+          {t("deleteDialog.message", { title: note.title })}
         </p>
 
         {error && (
@@ -45,7 +47,7 @@ function DeleteNoteDialog({
             disabled={isDeleting}
             className="rounded-xl border border-gray-200 px-4 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50 disabled:opacity-50"
           >
-            Cancel
+            {t("note.cancel")}
           </button>
 
           <button
@@ -54,12 +56,14 @@ function DeleteNoteDialog({
             disabled={isDeleting}
             className="rounded-xl bg-red-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60"
           >
-            {isDeleting ? 'Deleting...' : 'Delete note'}
+            {isDeleting
+              ? t("deleteDialog.deleting")
+              : t("deleteDialog.confirm")}
           </button>
         </div>
       </section>
     </div>
-  )
+  );
 }
 
-export default DeleteNoteDialog
+export default DeleteNoteDialog;

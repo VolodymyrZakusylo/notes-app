@@ -1,17 +1,19 @@
-import { create } from 'zustand'
-import { notesApi } from '../services/notesApi'
-import type { Note, SaveNoteRequest } from '../types/note'
+import { create } from "zustand";
+import { notesApi } from "../services/notesApi";
+import type { Note, SaveNoteRequest } from "../types/note";
+
+type NotesError = "errors.load" | "errors.generic";
 
 interface NotesState {
-  notes: Note[]
-  isLoading: boolean
-  error: string | null
+  notes: Note[];
+  isLoading: boolean;
+  error: NotesError | null;
 
-  fetchNotes: () => Promise<void>
-  createNote: (request: SaveNoteRequest) => Promise<Note>
-  updateNote: (id: string, request: SaveNoteRequest) => Promise<Note>
-  deleteNote: (id: string) => Promise<void>
-  clearError: () => void
+  fetchNotes: () => Promise<void>;
+  createNote: (request: SaveNoteRequest) => Promise<Note>;
+  updateNote: (id: string, request: SaveNoteRequest) => Promise<Note>;
+  deleteNote: (id: string) => Promise<void>;
+  clearError: () => void;
 }
 
 export const useNotesStore = create<NotesState>((set) => ({
@@ -20,68 +22,66 @@ export const useNotesStore = create<NotesState>((set) => ({
   error: null,
 
   fetchNotes: async () => {
-    set({ isLoading: true, error: null })
+    set({ isLoading: true, error: null });
 
     try {
-      const notes = await notesApi.getAll()
-      set({ notes })
+      const notes = await notesApi.getAll();
+      set({ notes });
     } catch {
-      set({ error: 'Failed to load notes.' })
+      set({ error: "errors.load" });
     } finally {
-      set({ isLoading: false })
+      set({ isLoading: false });
     }
   },
 
   createNote: async (request) => {
-    set({ error: null })
+    set({ error: null });
 
     try {
-      const note = await notesApi.create(request)
+      const note = await notesApi.create(request);
 
       set((state) => ({
         notes: [note, ...state.notes],
-      }))
+      }));
 
-      return note
+      return note;
     } catch (error) {
-      set({ error: 'Failed to create note.' })
-      throw error
+      set({ error: "errors.generic" });
+      throw error;
     }
   },
 
   updateNote: async (id, request) => {
-    set({ error: null })
+    set({ error: null });
 
     try {
-      const updatedNote = await notesApi.update(id, request)
+      const updatedNote = await notesApi.update(id, request);
 
       set((state) => ({
-        notes: state.notes.map((note) =>
-          note.id === id ? updatedNote : note,
-        ),
-      }))
+        notes: state.notes.map((note) => (note.id === id ? updatedNote : note)),
+      }));
 
-      return updatedNote
+      return updatedNote;
     } catch (error) {
-      set({ error: 'Failed to update note.' })
-      throw error
+      set({ error: "errors.generic" });
+      throw error;
     }
   },
 
   deleteNote: async (id) => {
-    set({ error: null })
+    set({ error: null });
 
     try {
-      await notesApi.delete(id)
+      await notesApi.delete(id);
 
       set((state) => ({
         notes: state.notes.filter((note) => note.id !== id),
-      }))
+      }));
     } catch (error) {
-      set({ error: 'Failed to delete note.' })
-      throw error
+      set({ error: "errors.generic" });
+      throw error;
     }
   },
 
   clearError: () => set({ error: null }),
-}))
+}));

@@ -1,43 +1,45 @@
-
-import { useState, type FormEvent } from 'react'
-import type { Note, SaveNoteRequest } from '../types/note'
+import { useState, type FormEvent } from "react";
+import { useTranslation } from "react-i18next";
+import type { Note, SaveNoteRequest } from "../types/note";
 
 interface NoteFormProps {
-  note: Note | null
-  onSave: (request: SaveNoteRequest) => Promise<void>
-  onCancel: () => void
+  note: Note | null;
+  onSave: (request: SaveNoteRequest) => Promise<void>;
+  onCancel: () => void;
 }
 
 function NoteForm({ note, onSave, onCancel }: NoteFormProps) {
-  const [title, setTitle] = useState(note?.title ?? '')
-  const [content, setContent] = useState(note?.content ?? '')
-  const [isSaving, setIsSaving] = useState(false)
-  const [submitError, setSubmitError] = useState<string | null>(null)
+  const { t } = useTranslation();
 
-  const isEditing = note !== null
+  const [title, setTitle] = useState(note?.title ?? "");
+  const [content, setContent] = useState(note?.content ?? "");
+  const [isSaving, setIsSaving] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+
+  const isEditing = note !== null;
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault()
+    event.preventDefault();
 
     const request: SaveNoteRequest = {
       title: title.trim(),
       content: content.trim(),
-    }
+    };
 
     if (!request.title || !request.content) {
-      setSubmitError('Please fill in both fields.')
-      return
+      setSubmitError(t("note.required"));
+      return;
     }
 
-    setIsSaving(true)
-    setSubmitError(null)
+    setIsSaving(true);
+    setSubmitError(null);
 
     try {
-      await onSave(request)
+      await onSave(request);
     } catch {
-      setSubmitError('Something went wrong. Please try again.')
+      setSubmitError(t("note.saveError"));
     } finally {
-      setIsSaving(false)
+      setIsSaving(false);
     }
   }
 
@@ -46,7 +48,7 @@ function NoteForm({ note, onSave, onCancel }: NoteFormProps) {
       className="fixed inset-0 z-50 flex items-center justify-center bg-gray-950/40 p-4 backdrop-blur-sm"
       onMouseDown={(event) => {
         if (event.target === event.currentTarget && !isSaving) {
-          onCancel()
+          onCancel();
         }
       }}
     >
@@ -62,13 +64,13 @@ function NoteForm({ note, onSave, onCancel }: NoteFormProps) {
               id="note-form-title"
               className="text-xl font-bold tracking-tight"
             >
-              {isEditing ? 'Edit note' : 'Create a note'}
+              {isEditing ? t("note.editTitle") : t("note.createTitle")}
             </h2>
 
             <p className="mt-2 text-sm text-gray-500">
               {isEditing
-                ? 'Make changes to your note.'
-                : 'Capture a thought before it slips away.'}
+                ? t("note.editDescription")
+                : t("note.createDescription")}
             </p>
           </div>
 
@@ -76,7 +78,7 @@ function NoteForm({ note, onSave, onCancel }: NoteFormProps) {
             type="button"
             onClick={onCancel}
             disabled={isSaving}
-            aria-label="Close form"
+            aria-label={t("note.closeForm")}
             className="rounded-lg p-2 text-gray-400 transition hover:bg-gray-100 hover:text-gray-700 disabled:opacity-50"
           >
             <svg
@@ -98,7 +100,7 @@ function NoteForm({ note, onSave, onCancel }: NoteFormProps) {
               htmlFor="note-title"
               className="mb-2 block text-sm font-medium text-gray-700"
             >
-              Title
+              {t("note.titleLabel")}
             </label>
 
             <input
@@ -110,7 +112,7 @@ function NoteForm({ note, onSave, onCancel }: NoteFormProps) {
               maxLength={100}
               required
               autoFocus
-              placeholder="Give your note a title"
+              placeholder={t("note.titlePlaceholder")}
               className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm outline-none transition placeholder:text-gray-400 focus:border-violet-400 focus:ring-4 focus:ring-violet-100"
             />
 
@@ -124,7 +126,7 @@ function NoteForm({ note, onSave, onCancel }: NoteFormProps) {
               htmlFor="note-content"
               className="mb-2 block text-sm font-medium text-gray-700"
             >
-              Content
+              {t("note.contentLabel")}
             </label>
 
             <textarea
@@ -135,7 +137,7 @@ function NoteForm({ note, onSave, onCancel }: NoteFormProps) {
               maxLength={5000}
               required
               rows={6}
-              placeholder="Write down your thoughts..."
+              placeholder={t("note.contentPlaceholder")}
               className="w-full resize-y rounded-xl border border-gray-200 px-4 py-3 text-sm leading-6 outline-none transition placeholder:text-gray-400 focus:border-violet-400 focus:ring-4 focus:ring-violet-100"
             />
 
@@ -157,7 +159,7 @@ function NoteForm({ note, onSave, onCancel }: NoteFormProps) {
               disabled={isSaving}
               className="rounded-xl border border-gray-200 px-5 py-3 text-sm font-semibold text-gray-700 transition hover:bg-gray-50 disabled:opacity-50"
             >
-              Cancel
+              {t("note.cancel")}
             </button>
 
             <button
@@ -166,16 +168,16 @@ function NoteForm({ note, onSave, onCancel }: NoteFormProps) {
               className="rounded-xl bg-violet-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-violet-700 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {isSaving
-                ? 'Saving...'
+                ? t("note.saving")
                 : isEditing
-                  ? 'Save changes'
-                  : 'Create note'}
+                  ? t("note.saveChanges")
+                  : t("note.createButton")}
             </button>
           </div>
         </form>
       </section>
     </div>
-  )
+  );
 }
 
-export default NoteForm
+export default NoteForm;

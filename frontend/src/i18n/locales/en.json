@@ -1,0 +1,56 @@
+{
+  "app": {
+    "name": "Notes",
+    "tagline": "Your personal space"
+  },
+  "home": {
+    "eyebrow": "Your workspace",
+    "title": "All notes",
+    "description": "Keep your thoughts and ideas in one place.",
+    "newNote": "New note",
+    "searchPlaceholder": "Search your notes...",
+    "loading": "Loading your notes...",
+    "noResults": "No matching notes",
+    "noResultsHint": "Try another search term.",
+    "emptyTitle": "Your notes will appear here",
+    "emptyDescription": "There are no notes yet. Once you create one, it will show up here.",
+    "retry": "Try again"
+  },
+  "note": {
+    "created": "Created {{date}}",
+    "updated": "Updated {{date}}",
+    "edit": "Edit",
+    "delete": "Delete",
+    "titlePlaceholder": "Note title",
+    "contentPlaceholder": "Write your thoughts...",
+    "createTitle": "Create a note",
+    "editTitle": "Edit note",
+    "save": "Save note",
+    "cancel": "Cancel",
+    "saving": "Saving...",
+    "required": "Please fill in both fields.",
+    "saveError": "Something went wrong. Please try again.",
+    "editDescription": "Make changes to your note.",
+    "createDescription": "Capture a thought before it slips away.",
+    "closeForm": "Close form",
+    "titleLabel": "Title",
+    "contentLabel": "Content",
+    "saveChanges": "Save changes",
+    "createButton": "Create note"
+  },
+  "deleteDialog": {
+    "title": "Delete this note?",
+    "message": "Are you sure you want to delete \"{{title}}\"? This action cannot be undone.",
+    "confirm": "Delete note",
+    "deleting": "Deleting..."
+  },
+  "errors": {
+    "load": "Failed to load notes.",
+    "generic": "Something went wrong. Please try again."
+  },
+  "language": {
+    "label": "Language",
+    "english": "English",
+    "ukrainian": "Ukrainian"
+  }
+}
